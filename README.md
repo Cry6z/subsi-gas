@@ -1,4 +1,4 @@
-# Distribusi Gas Subsidi
+# Subsi-Gas
 
 Stack: Laravel 12 + Livewire + Flux UI + TailwindCSS + MySQL.
 
