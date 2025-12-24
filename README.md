@@ -32,6 +32,8 @@ Sistem distribusi LPG subsidi yang memvisualisasikan titik penyalur di peta, mem
 
 ## Preview & Screenshots
 
+Simpan file gambar pada direktori `docs/screenshots` (buat bila belum ada) agar rapi di versi kontrol. Gunakan rasio 16:9 atau 4:3 dengan resolusi minimal 1280px agar detail UI tetap jelas.
+
 | Halaman              | Deskripsi singkat                         | Preview                                                                 |
 |----------------------|-------------------------------------------|-------------------------------------------------------------------------|
 | Landing Map Publik   | Lokasi penyalur di peta + filter stok     | ![Landing Placeholder](docs/screenshots/landing-map.png)               |
