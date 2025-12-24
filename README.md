@@ -37,8 +37,8 @@ Simpan file gambar pada direktori `docs/screenshots` (buat bila belum ada) agar 
 | Halaman              | Deskripsi singkat                         | Preview                                                                 |
 |----------------------|-------------------------------------------|-------------------------------------------------------------------------|
 | Landing Map Publik   | Lokasi penyalur di peta + filter stok     |<img width="1920" height="1080" alt="Screenshot 2025-12-25 002130" src="https://github.com/user-attachments/assets/4938ed88-6f79-45d1-92a7-f52879c1ae35" />
-| Dashboard Admin      | Ringkasan stok, tabel distributor, ekspor | ![Admin Placeholder](docs/screenshots/admin-dashboard.png)             |
-| Dashboard Distributor| CRUD lokasi & update stok                | ![Distributor Placeholder](docs/screenshots/distributor-dashboard.png) |
+| Dashboard Admin      | Ringkasan stok, tabel distributor, ekspor |<img width="1920" height="1080" alt="Screenshot 2025-12-25 002302" src="https://github.com/user-attachments/assets/d213008a-1263-4b87-9000-2e845b301a06" /> |
+| Dashboard Distributor| CRUD lokasi & update stok                |<img width="1920" height="1080" alt="Screenshot 2025-12-25 002436" src="https://github.com/user-attachments/assets/2782f84d-c88a-4b99-b1cf-e5c4abe6ab79" /> |
 
 > Ganti tautan gambar di atas dengan screenshot aktual setelah diunggah.
 
