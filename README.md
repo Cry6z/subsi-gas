@@ -1,102 +1,147 @@
-# Distribusi Gas Subsidi
+# Subsi-Gas
 
-Stack: Laravel 12 + Livewire + Flux UI + TailwindCSS + MySQL.
+Sistem distribusi LPG subsidi yang memvisualisasikan titik penyalur di peta, memantau stok tabung, serta membantu admin dan distributor mengelola rantai pasok secara transparan. Proyek ini dibangun dengan Laravel 12 + Livewire (Flux UI) sehingga seluruh dashboard bersifat reactive tanpa harus menulis JavaScript manual.
 
-## Requirements
+## Daftar Isi
+
+1. [Fitur Utama](#fitur-utama)
+2. [Preview & Screenshots](#preview--screenshots)
+3. [Stack Teknologi](#stack-teknologi)
+4. [Persyaratan](#persyaratan)
+5. [Setup Cepat](#setup-cepat)
+6. [Menjalankan Aplikasi](#menjalankan-aplikasi)
+7. [Akun Seed Default](#akun-seed-default)
+8. [Struktur Modul & Routing](#struktur-modul--routing)
+9. [Arsitektur & Alur Data](#arsitektur--alur-data)
+10. [Peta & Pencarian Lokasi Terdekat](#peta--pencarian-lokasi-terdekat)
+11. [Alur Undangan Distributor & Email](#alur-undangan-distributor--email)
+12. [Testing & Quality](#testing--quality)
+13. [Troubleshooting](#troubleshooting)
+14. [Deployment](#deployment)
+15. [Kontribusi](#kontribusi)
+16. [Lisensi](#lisensi)
+
+## Fitur Utama
+
+1. **Peta publik interaktif** – Landing page menampilkan lokasi penyalur gas subsidi beserta stok, jam operasional, foto, dan kontak.
+2. **Dashboard Admin** – Mengelola distributor, mengimpor lokasi massal, mengekspor laporan stok, dan memantau status aktif.
+3. **Dashboard Distributor** – Distributor dapat menambah/memperbarui lokasi, melampirkan foto, serta mencatat perubahan stok.
+4. **Pencarian lokasi terdekat** – Query Haversine di MySQL (fallback perhitungan PHP untuk SQLite) membantu warga menemukan penyalur dalam radius tertentu.
+5. **Alur undangan** – Distributor baru dibuat oleh admin dan menerima tautan reset password melalui email (tanpa mengirim kata sandi plaintext).
+6. **Integrasi peta fleksibel** – Leaflet memakai tile Mapbox bila token tersedia atau fallback ke OpenStreetMap tanpa biaya.
+
+## Preview & Screenshots
+
+| Halaman              | Deskripsi singkat                         | Preview                                                                 |
+|----------------------|-------------------------------------------|-------------------------------------------------------------------------|
+| Landing Map Publik   | Lokasi penyalur di peta + filter stok     | ![Landing Placeholder](docs/screenshots/landing-map.png)               |
+| Dashboard Admin      | Ringkasan stok, tabel distributor, ekspor | ![Admin Placeholder](docs/screenshots/admin-dashboard.png)             |
+| Dashboard Distributor| CRUD lokasi & update stok                | ![Distributor Placeholder](docs/screenshots/distributor-dashboard.png) |
+
+> Ganti tautan gambar di atas dengan screenshot aktual setelah diunggah.
+
+## Stack Teknologi
+
+- Laravel 12, Fortify, Policies & Middleware role-based
+- Livewire + Flux UI components + TailwindCSS + Vite
+- MySQL (produksi) / SQLite (pengujian) + Eloquent
+- Leaflet.js untuk visualisasi peta
+- Queue worker (opsional) untuk email undangan
+
+## Persyaratan
 
 - PHP 8.2+
 - Composer
 - Node.js + npm
-- MySQL
+- MySQL / MariaDB
 
-## Setup
-
-1. Install dependencies
+## Setup Cepat
 
 ```bash
 composer install
 npm install
 ```
 
-2. Create `.env`
+1. **Salin / buat `.env`**  
+   Repo menyediakan `.env.example`. Minimal variabel:
 
-Copy your `.env` manually (this repo may not ship a `.env.example`). Minimal keys:
+   ```env
+   APP_NAME="Subsi-Gas"
+   APP_ENV=local
+   APP_KEY=
+   APP_DEBUG=true
+   APP_URL=http://localhost
 
-```env
-APP_NAME="subsi_gas"
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-APP_URL=http://localhost
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=subsi_gas
+   DB_USERNAME=root
+   DB_PASSWORD=
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=subsi_gas
-DB_USERNAME=root
-DB_PASSWORD=
+   # Opsional (Leaflet tetap jalan dengan OSM tanpa token)
+   MAPBOX_TOKEN=
+   GOOGLE_MAPS_API_KEY=
+   ```
 
-# Optional (Leaflet can use OpenStreetMap tiles without a token)
-MAPBOX_TOKEN=
-# Optional alternative
-GOOGLE_MAPS_API_KEY=
-```
+2. **Generate app key**
 
-Generate key:
+   ```bash
+   php artisan key:generate
+   ```
 
-```bash
-php artisan key:generate
-```
+3. **Migrasi + seed**
 
-3. Migrate + seed
+   ```bash
+   php artisan migrate --seed
+   ```
 
-```bash
-php artisan migrate --seed
-```
+4. **Link storage (unggah foto lokasi)**
 
-4. Storage (photo uploads)
+   ```bash
+   php artisan storage:link
+   ```
 
-```bash
-php artisan storage:link
-```
+## Menjalankan Aplikasi
 
-5. Run
+- Jalur terpisah:
 
-```bash
-npm run dev
-php artisan serve
-```
+  ```bash
+  npm run dev
+  php artisan serve
+  ```
 
-## Default Seeded Accounts
+- Atau gunakan skrip `composer run dev` untuk menjalankan server, queue listener, dan Vite secara paralel.
 
-All seeded users use password: `password`
+## Akun Seed Default
 
-- Admin
-  - email: `admin@example.com` (or `ADMIN_EMAIL`)
-- Distributors
-  - created by seeder (3 accounts)
+- Seluruh akun seeded memakai kata sandi `password`.
+- **Admin:** `admin@example.com` (bisa diubah lewat env `ADMIN_EMAIL`).
+- **Distributor:** dibuat otomatis (3 akun contoh). Admin dapat menambah distributor baru melalui dashboard.
 
-## Routing / Role Redirect
+## Struktur Modul & Routing
 
-- After login, users go to `/dashboard` which redirects by role:
-  - `admin` -> `/admin/dashboard`
-  - `distributor` -> `/distributor/dashboard`
+| Peran        | Route utama                     | Komponen Livewire                                  |
+|--------------|----------------------------------|----------------------------------------------------|
+| Publik       | `/`                              | `App\Livewire\Public\LandingMap`                   |
+| Auth umum    | `/dashboard`                     | Redirect peran via middleware `auth`, `active`     |
+| Admin        | `/admin/...`                     | Dashboard, manajemen distributor & lokasi, ekspor  |
+| Distributor  | `/distributor/...`               | Tabel lokasi, CRUD lokasi, ringkasan stok          |
+| Pengaturan   | `/settings/profile|password|...` | Profil, kata sandi, preferensi tampilan            |
 
-Role middleware:
+Middleware `role:admin` dan `role:distributor` memastikan akses sesuai peran.
 
-- `role:admin`
-- `role:distributor`
+## Arsitektur & Alur Data
 
-## Maps
+- **Lapisan presentasi**: Blade minimal + komponen Livewire untuk interaksi reaktif tanpa JavaScript kustom.
+- **Lapisan domain**: Model `Location`, `Distributor`, `StockMutation` memakai Policy untuk membatasi aksi berdasarkan peran.
+- **Integrasi pihak ketiga**:
+  - Map tiles via Mapbox/OSM.
+  - Email melalui SMTP (bisa diganti Ses, Mailgun, dll).
+- **Pencatatan stok**: Mutasi stok dicatat agar audit trail tersedia dan bisa diekspor.
+- **Queue**: Event undangan dan email berat dapat dipindahkan ke queue (`database`/`redis`) agar UI tetap responsif.
 
-This project uses **Leaflet**.
-
-- If `MAPBOX_TOKEN` is provided, tiles will use Mapbox.
-- If empty, it falls back to OpenStreetMap tiles.
-
-### Nearby Search (Haversine)
-
-Production (MySQL) uses SQL Haversine:
+## Peta & Pencarian Lokasi Terdekat
 
 ```sql
 SELECT id, name, address, latitude, longitude, stock,
@@ -110,28 +155,67 @@ HAVING distance <= :radius
 ORDER BY distance ASC;
 ```
 
-Tests use SQLite in-memory; in that case the app falls back to computing distances in PHP.
+Saat testing dengan SQLite in-memory, jarak dihitung ulang di PHP (`Location::haversineDistanceKm`).  
+Jika `MAPBOX_TOKEN` kosong, Leaflet otomatis memakai OpenStreetMap tiles.
 
-## Admin creates distributor (invite flow)
+## Alur Undangan Distributor & Email
 
-- Distributors do not self-register.
-- Admin creates distributor accounts via Admin UI.
-- The system does not email plaintext passwords. It sends a password reset link so the distributor can set their own password.
+1. Admin membuat distributor dari dashboard.
+2. Aplikasi mengirim tautan reset password; distributor menetapkan kredensial sendiri.
+3. Pastikan konfigurasi mail di `.env` terisi:
 
-Mail must be configured in `.env` for invites to be delivered:
+   ```env
+   MAIL_MAILER=smtp
+   MAIL_HOST=smtp.example.com
+   MAIL_PORT=587
+   MAIL_USERNAME=
+   MAIL_PASSWORD=
+   MAIL_ENCRYPTION=tls
+   MAIL_FROM_ADDRESS=no-reply@example.com
+   MAIL_FROM_NAME="${APP_NAME}"
+   ```
 
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=
-MAIL_PORT=
-MAIL_USERNAME=
-MAIL_PASSWORD=
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=no-reply@example.com
-MAIL_FROM_NAME="${APP_NAME}"
+## Testing & Quality
+
+```bash
+php artisan test
 ```
 
-## Notes
+Gunakan `./vendor/bin/pest` jika ingin menjalankan Pest langsung. Jalankan `php artisan config:clear` sebelum test bila mengganti env.
 
-- Two-factor authentication is disabled.
-- Email verification is disabled.
+## Troubleshooting
+
+1. **Gagal load foto lokasi** – pastikan `storage/app/public` sudah di-link dan direktori `storage/logs` writable.
+2. **Email tidak terkirim** – cek kredensial SMTP dan jalankan queue worker (`php artisan queue:listen`) bila memakai driver `database`/`redis`.
+3. **Map kosong** – pastikan tabel `locations` berisi seed dan browser mengizinkan geolocation (untuk pencarian radius).
+
+## Deployment
+
+1. **Build aset produksi**
+   ```bash
+   npm run build
+   ```
+2. **Optimasi Laravel**
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   php artisan event:cache
+   ```
+3. **Konfigurasi server**
+   - PHP-FPM 8.2+, `memory_limit` minimal 256M.
+   - Point document root ke `public/`.
+   - Pastikan direktori `storage` dan `bootstrap/cache` writable.
+4. **Scheduler & Queue**
+   - Tambahkan cron `* * * * * php /path/artisan schedule:run`.
+   - Jalankan queue worker (Supervisor / systemd) bila memakai driver async.
+
+## Kontribusi
+
+1. Fork repo & buat branch feature/bugfix baru.
+2. Pastikan lint & test lulus sebelum membuat PR.
+3. Sertakan deskripsi perubahan dan tangkapan layar bila mengubah UI.
+4. Untuk isu besar, buka diskusi/issue terlebih dahulu agar rancangan selaras roadmap.
+
+## Lisensi
+
+MIT License mengikuti lisensi default Laravel starter kit.
