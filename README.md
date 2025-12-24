@@ -1,4 +1,4 @@
-# Subsi-Gas
+# Subsi-Gas  @ReiiMurr
 
 Stack: Laravel 12 + Livewire + Flux UI + TailwindCSS + MySQL.
 
@@ -136,5 +136,3 @@ MAIL_FROM_NAME="${APP_NAME}"
 - Two-factor authentication is disabled.
 - Email verification is disabled.
 
-
-# Team with @ReiiMurr
