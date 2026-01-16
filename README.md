@@ -1,5 +1,9 @@
 # Subsi-Gas
 
+![Laravel 12](https://img.shields.io/badge/Laravel-12.x-ff2d20?logo=laravel&logoColor=white)
+![PHP 8.3](https://img.shields.io/badge/PHP-8.3-777bb4?logo=php&logoColor=white)
+![Livewire](https://img.shields.io/badge/Livewire-Volt%20%2B%20Flux-9333ea?logo=livewire&logoColor=white)
+
 Sistem distribusi LPG subsidi yang memvisualisasikan titik penyalur di peta, memantau stok tabung, serta membantu admin dan distributor mengelola rantai pasok secara transparan. Proyek ini dibangun dengan Laravel 12 + Livewire (Flux UI) sehingga seluruh dashboard bersifat reactive tanpa harus menulis JavaScript manual.
 
 ## Daftar Isi
